@@ -68,22 +68,36 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
   int i;
   int * pred_node = malloc(vertices * sizeof(int));
 
+  heap_head * head = malloc(sizeof(heap_head));
+  head->size = 0;
+  head->min_heap = malloc(vertices * sizeof(heap_node *));
+
   for (i = 0; i < vertices; i++){
     adj_list[i].dist = INT_MAX;
     pred_node[i] = -1;
+    heap_node * ins_node = malloc(sizeof(heap_node));
+    ins_node->dist = INT_MAX;
+    ins_node->index = i;
+    if (i == q_start){
+      ins_node->dist = 0;
+      ins_node->index = q_start;
+    }
+    insert_heap(head, ins_node);
   }
 
   adj_list[q_start].dist = 0;
 
-  for (i = 0; i < vertices; i++){
-    int min_index = find_min_index(adj_list, vertices);
-
+  while (head->size != 0){
+    int min_index = remove_min(head);
     l_node * temp = adj_list[min_index].head_l;
 
     while (temp != NULL){
       if (adj_list[temp->node].dist > adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node)){
+        printf("%d %d\n", min_index, adj_list[min_index].dist);
         adj_list[temp->node].dist = adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node);
+        //printf("%d\n", temp->node);
         pred_node[temp->node] = min_index;
+        sift_down(head->min_heap, head->size, temp->node);
       }
       temp = temp->next;
     }
@@ -95,28 +109,27 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
   return;
 }
 
-heap_node * remove_min(heap_head * head){
+int remove_min(heap_head * head){
   if (head->size){
     heap_node * min_node = head->min_heap[0];
     heap_node * last_element = head->min_heap[head->size - 1];
-    head->min_heap[head->size - 1] = NULL;
     head->min_heap[0] = last_element;
     head->size--;
-    sift_down(head-min_heap, head->size, 0);
-    return min_node;
+    sift_down(head->min_heap, head->size, 0);
+    return min_node->index;
   }
   return 0;
 }
 
-void sift_down(heap_node * head, int size, int root){
+void sift_down(heap_node * * head, int size, int root){
   int left_idx = (2 * root) + 1;
   int right_idx = (2 * root) + 2;
-  heap_node * min_node = NULL;
-  if (left_idx >= size && right _idx >= size){
+  heap_node * min_node;
+  if (left_idx >= size && right_idx >= size){
     return;
   }
   if (left_idx < size && head[root]->dist <= head[left_idx]->dist){
-    if (right idx < size && head[root]->dist <= head[right_idx]->dist){
+    if (right_idx < size && head[root]->dist <= head[right_idx]->dist){
       return;
     }
   }
@@ -130,7 +143,7 @@ void sift_down(heap_node * head, int size, int root){
     min_node = head[left_idx];
     head[left_idx] = head[root];
     head[root] = min_node;
-    sfit_down(head, size, left_idx);
+    sift_down(head, size, left_idx);
   }
   return;
 }
@@ -150,7 +163,7 @@ void insert_heap(heap_head * head, heap_node * ins_node){
       child_idx = parent_idx;
       parent_idx = (child_idx - 1) / 2;
     }
-    head->mind_heap[child_idx] = ins_node;
+    head->min_heap[child_idx] = ins_node;
   }
   return;
 }
