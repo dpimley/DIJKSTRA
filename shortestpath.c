@@ -17,13 +17,16 @@ int main(int argc, char * * argv){
 
   fscanf(inf, "%d %d", &vertices, &edges);
 
+  FILE * inf_q = fopen(argv[2], "r");
+
+  if (inf_q == NULL){
+    printf("ERROR: Input file pointer initialized to NULL.\n");
+    return EXIT_FAILURE;
+  }
+
   vertice_h * adj_list = readfile(inf, vertices, edges);
 
-  int q_start = 6;
-
-  int q_end = 23; 
-
-  dijkstra(adj_list, vertices, edges, q_start, q_end);
+  run_queries(inf_q, adj_list, vertices, edges);
 
   fclose(inf);  
 
@@ -53,6 +56,17 @@ vertice_h * readfile(FILE * infile, int vertices, int edges){
   }
 
   return adj_list;
+}
+
+void run_queries(FILE * infile, vertice_h * adj_list, int vertices, int edges){
+  int num_queries, q_start, q_end;
+  fscanf(infile, "%d", &num_queries);
+  int i;
+  for (i = 0; i < num_queries; i++){
+    fscanf(infile, "%d %d", &q_start, &q_end);
+    dijkstra(adj_list, vertices, edges, q_start, q_end);
+  }
+  return;
 }
 
 void ins_head(l_node * * head, int node){
@@ -94,6 +108,8 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
       printf("%d\n", adj_list[q_end].dist);
       print_reverse(pred_node, min_index);
       printf("\n");
+      //free_adj_list(adj_list, vertices);
+      //free_heap(head, vertices);
       return;
     }
         
@@ -117,7 +133,6 @@ int remove_min(heap_head * head){
   if (head->size > 0){
     heap_node * min_node = head->min_heap[0];
     heap_node * last_element = head->min_heap[head->size - 1];
-    head->min_heap[head->size - 1] = NULL;
     head->min_heap[0] = last_element;
     head->size--;
     sift_down(head->min_heap, head->size, 0);
@@ -210,6 +225,34 @@ void print_reverse(int * prev, int i){
   printf("%d ", i);
   return;
 }
+
+void free_list(l_node * head){
+  while (head != NULL){
+    l_node * temp = head;
+    head = head->next;
+    free(temp);
+  }
+  return;
+}
+
+void free_adj_list(vertice_h * adj_list, int vertices){
+  int i;
+  for (i = 0; i < vertices; i++){
+    free_list((adj_list[i]).head_l);
+  }
+  free(adj_list);
+  return;
+}
+
+void free_heap(heap_head * head, int vertices){
+  int i;
+  for (i = 0; i < vertices; i++){
+    free(head->min_heap[i]);
+  }
+  free(head->min_heap);
+  free(head);
+}
+
 int weighted_distance(vertice_h * adj_list, int u, int v){
   return (int)sqrt(((adj_list[u].v_x - adj_list[v].v_x) * (adj_list[u].v_x - adj_list[v].v_x)) + ((adj_list[u].v_y - adj_list[v].v_y) * (adj_list[u].v_y - adj_list[v].v_y)));
 }

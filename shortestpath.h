@@ -25,6 +25,8 @@ typedef struct heap_head{
 
 vertice_h * readfile(FILE * infile, int vertices, int edges);
 
+void run_queries(FILE * infile, vertice_h * adj_list, int vertices, int edges);
+
 void ins_head(l_node * * head, int node);
 
 void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_end);
@@ -40,6 +42,12 @@ int find_heap_idx(heap_node * * head, int index);
 void sift_up(heap_head * head, int index);
 
 void print_reverse(int * prev, int i);
+
+void free_list(l_node * head);
+
+void free_adj_list(vertice_h * adj_list, int vertices);
+
+void free_heap(heap_head * head, int vertices);
 
 int weighted_distance(vertice_h * adj_list, int u, int v);
 
