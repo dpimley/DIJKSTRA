@@ -28,7 +28,10 @@ int main(int argc, char * * argv){
 
   run_queries(inf_q, adj_list, vertices, edges);
 
+  free_adj_list(adj_list, vertices);
+
   fclose(inf);  
+  fclose(inf_q);
 
   return EXIT_SUCCESS;
 }
@@ -100,16 +103,17 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
   }
 
   adj_list[q_start].dist = 0;
+  int heap_idx;
 
   while (head->size != 0){
     int min_index = remove_min(head);
-
+   
     if (min_index == q_end){
       printf("%d\n", adj_list[q_end].dist);
       print_reverse(pred_node, min_index);
       printf("\n");
-      //free_adj_list(adj_list, vertices);
       //free_heap(head, vertices);
+      free(pred_node);
       return;
     }
         
@@ -119,7 +123,7 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
       if (adj_list[temp->node].dist > adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node)){
         adj_list[temp->node].dist = adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node);
         pred_node[temp->node] = min_index;
-        int heap_idx = find_heap_idx(head->min_heap, temp->node);
+        heap_idx = find_heap_idx(head->min_heap, temp->node);
         head->min_heap[heap_idx]->dist = adj_list[temp->node].dist;
         sift_up(head, heap_idx);
       }
@@ -189,7 +193,7 @@ void insert_heap(heap_head * head, heap_node * ins_node){
 }
 
 int find_heap_idx(heap_node * * head, int index){
-  int i;
+  int i = 0;
   while (head[i]->index != index){
     i++;
   }
@@ -206,9 +210,6 @@ void sift_up(heap_head * head, int index){
   while (head->min_heap[parent_idx]->dist > ins_node->dist && child_idx > 0){
     head->min_heap[child_idx] = head->min_heap[parent_idx];
     child_idx = parent_idx;
-    if (child_idx == 0){
-      break;
-    }
     parent_idx = (child_idx - 1) / 2;
   }
   head->min_heap[child_idx] = ins_node;
@@ -220,7 +221,6 @@ void print_reverse(int * prev, int i){
     printf("%d ", i);
     return;
   }
-
   print_reverse(prev, prev[i]);
   printf("%d ", i);
   return;
