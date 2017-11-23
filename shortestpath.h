@@ -35,6 +35,12 @@ void sift_down(heap_node * * head, int size, int root);
 
 void insert_heap(heap_head * head, heap_node * ins_node);
 
+int find_heap_idx(heap_node * * head, int index);
+
+void sift_up(heap_head * head, int index);
+
+void print_reverse(int * prev, int i);
+
 int weighted_distance(vertice_h * adj_list, int u, int v);
 
 #endif
