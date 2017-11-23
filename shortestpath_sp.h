@@ -13,14 +13,9 @@ typedef struct vertice_h{
   l_node * head_l;
 }vertice_h;
 
-typedef struct heap_node{
-  int index;
-  int dist;
-}heap_node;
-
 typedef struct heap_head{
   int size;
-  heap_node * min_heap;
+  int * min_heap;
 }heap_head;
 
 vertice_h * readfile(FILE * infile, int vertices, int edges);
@@ -31,21 +26,17 @@ void ins_head(l_node * * head, int node);
 
 void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_end, int * pred_node, heap_head * head);
 
-int remove_min(heap_head * head);
+int remove_min(heap_head * head, vertice_h * adj_list);
 
-void sift_down(heap_node * head, int size, int root);
+void sift_down(heap_head * head, vertice_h * adj_list, int size, int root);
 
-void insert_heap(heap_head * head, heap_node ins_node);
+void insert_heap(heap_head * head, vertice_h * adj_list, int ins_node);
 
-int find_heap_idx(heap_node * head, int index);
+int find_heap_idx(heap_head * head, int index);
 
-void sift_up(heap_head * head, int index);
+void sift_up(heap_head * head, vertice_h * adj_list, int index);
 
 void print_reverse(int * prev, int i);
-
-void free_list(l_node * head);
-
-void free_adj_list(vertice_h * adj_list, int vertices);
 
 int weighted_distance(vertice_h * adj_list, int u, int v);
 
