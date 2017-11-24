@@ -116,7 +116,7 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
       if (adj_list[temp->node].dist > adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node)){
         adj_list[temp->node].dist = adj_list[min_index].dist + weighted_distance(adj_list, min_index, temp->node);
         pred_node[temp->node] = min_index;
-        heap_idx = find_heap_idx(head, temp->node);
+        heap_idx = adj_list[temp->node].heap_idx;
         head->min_heap[heap_idx] = temp->node;
         sift_up(head, adj_list, heap_idx);
       }
@@ -131,6 +131,7 @@ int remove_min(heap_head * head, vertice_h * adj_list){
     int min_node = head->min_heap[0];
     int last_element = head->min_heap[head->size - 1];
     head->min_heap[0] = last_element;
+    adj_list[head->min_heap[0]].heap_idx = 0;
     head->size--;
     sift_down(head, adj_list, head->size, 0);
     return min_node;
@@ -154,12 +155,16 @@ void sift_down(heap_head * head, vertice_h * adj_list, int size, int root){
     min_node = head->min_heap[right_idx];
     head->min_heap[right_idx] = head->min_heap[root];
     head->min_heap[root] = min_node;
+    adj_list[head->min_heap[right_idx]].heap_idx = right_idx;
+    adj_list[head->min_heap[root]].heap_idx = root;
     sift_down(head, adj_list, size, right_idx);
   }
   else{
     min_node = head->min_heap[left_idx];
     head->min_heap[left_idx] = head->min_heap[root];
     head->min_heap[root] = min_node;
+    adj_list[head->min_heap[left_idx]].heap_idx = left_idx;
+    adj_list[head->min_heap[root]].heap_idx = root;
     sift_down(head, adj_list, size, left_idx);
   }
   return;
@@ -177,20 +182,14 @@ void insert_heap(heap_head * head, vertice_h * adj_list, int ins_node){
     int parent_idx = (child_idx - 1) / 2;
     while (adj_list[head->min_heap[parent_idx]].dist > adj_list[ins_node].dist && child_idx > 0){
       head->min_heap[child_idx] = head->min_heap[parent_idx];
+      adj_list[head->min_heap[child_idx]].heap_idx = child_idx;
       child_idx = parent_idx;
       parent_idx = (child_idx - 1) / 2;
     }
     head->min_heap[child_idx] = ins_node;
+    adj_list[ins_node].heap_idx = child_idx;
   }
   return;
-}
-
-int find_heap_idx(heap_head * head, int index){
-  int i = 0;
-  while (head->min_heap[i] != index){
-    i++;
-  }
-  return i;
 }
 
 void sift_up(heap_head * head, vertice_h * adj_list, int index){
@@ -202,10 +201,12 @@ void sift_up(heap_head * head, vertice_h * adj_list, int index){
   int ins_node = head->min_heap[index];
   while (adj_list[head->min_heap[parent_idx]].dist > adj_list[ins_node].dist && child_idx > 0){
     head->min_heap[child_idx] = head->min_heap[parent_idx];
+    adj_list[head->min_heap[child_idx]].heap_idx = child_idx;
     child_idx = parent_idx;
     parent_idx = (child_idx - 1) / 2;
   }
   head->min_heap[child_idx] = ins_node;
+  adj_list[head->min_heap[child_idx]].heap_idx = child_idx;
   return;
 }
 
@@ -220,5 +221,17 @@ void print_reverse(int * prev, int i){
 }
 
 int weighted_distance(vertice_h * adj_list, int u, int v){
-  return (int)sqrt(((adj_list[u].v_x - adj_list[v].v_x) * (adj_list[u].v_x - adj_list[v].v_x)) + ((adj_list[u].v_y - adj_list[v].v_y) * (adj_list[u].v_y - adj_list[v].v_y)));
+  return (int)sqrt((((adj_list[u].v_x - adj_list[v].v_x) * (adj_list[u].v_x - adj_list[v].v_x)) + ((adj_list[u].v_y - adj_list[v].v_y) * (adj_list[u].v_y - adj_list[v].v_y))));
 }
+
+float f_sqrt(int number){
+  float x2 = number * 0.5f;
+  float y = number;
+  long i = *(long*)&y;
+  i = 0x5f3759df - (i >> 1);
+  y = *(float*)&i;
+  y = y * (1.5f - (x2 * y * y));
+  y = y * (1.5f - (x2 * y * y));
+  return (1 / y);
+}
+  

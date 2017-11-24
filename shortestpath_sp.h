@@ -10,6 +10,7 @@ typedef struct vertice_h{
   int v_x;
   int v_y;
   int dist;
+  int heap_idx;
   l_node * head_l;
 }vertice_h;
 
@@ -32,12 +33,12 @@ void sift_down(heap_head * head, vertice_h * adj_list, int size, int root);
 
 void insert_heap(heap_head * head, vertice_h * adj_list, int ins_node);
 
-int find_heap_idx(heap_head * head, int index);
-
 void sift_up(heap_head * head, vertice_h * adj_list, int index);
 
 void print_reverse(int * prev, int i);
 
 int weighted_distance(vertice_h * adj_list, int u, int v);
+
+float f_sqrt(int x);
 
 #endif
