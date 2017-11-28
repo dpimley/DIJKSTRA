@@ -85,6 +85,13 @@ void ins_head(l_node * * head, int node){
 }
 
 void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_end, int * pred_node, heap_head * head){
+
+  if (q_start >= vertices || q_start < 0 || q_end >= vertices || q_end < 0){
+    printf("PATH NOT FOUND\n");
+    printf("%d %d\n", q_start, q_end);
+    return;
+  }
+
   int i;
 
   head->size = 0;
@@ -94,19 +101,25 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
     if (i != q_start)
       adj_list[i].dist = INT_MAX;
     pred_node[i] = -1;
-    int ins_node = i;
-    insert_heap(head, adj_list,  ins_node);
+    insert_heap(head, adj_list, i);
   }
 
   int heap_idx;
+  int min_index;
 
   while (head->size != 0){
-    int min_index = remove_min(head, adj_list);
+    min_index = remove_min(head, adj_list);
    
     if (min_index == q_end){
-      printf("%d\n", adj_list[q_end].dist);
-      print_reverse(pred_node, min_index);
-      printf("\n");
+      if (adj_list[q_end].dist == INT_MAX){
+        printf("INF\n");
+        printf("%d %d\n", q_start, q_end);
+      }
+      else{
+        printf("%d\n", adj_list[q_end].dist);
+        print_reverse(pred_node, q_end);
+        printf("\n");
+      }
       return;
     }
         
@@ -123,6 +136,8 @@ void dijkstra(vertice_h * adj_list, int vertices, int edges, int q_start, int q_
       temp = temp->next;
     }
   }      
+  printf("PATH NOT FOUND\n");
+  printf("%d %d\n", q_start, q_end);
   return;
 }
 
@@ -221,7 +236,7 @@ void print_reverse(int * prev, int i){
 }
 
 int weighted_distance(vertice_h * adj_list, int u, int v){
-  return (int)sqrt((((adj_list[u].v_x - adj_list[v].v_x) * (adj_list[u].v_x - adj_list[v].v_x)) + ((adj_list[u].v_y - adj_list[v].v_y) * (adj_list[u].v_y - adj_list[v].v_y))));
+  return sqrt((((adj_list[u].v_x - adj_list[v].v_x) * (adj_list[u].v_x - adj_list[v].v_x)) + ((adj_list[u].v_y - adj_list[v].v_y) * (adj_list[u].v_y - adj_list[v].v_y))));
 }
 
 float f_sqrt(int number){
