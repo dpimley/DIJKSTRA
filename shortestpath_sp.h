@@ -7,8 +7,8 @@ typedef struct l_node{
 }l_node;
 
 typedef struct vertice_h{
-  int v_x;
-  int v_y;
+  unsigned short v_x;
+  unsigned short v_y;
   int dist;
   int heap_idx;
   l_node * head_l;

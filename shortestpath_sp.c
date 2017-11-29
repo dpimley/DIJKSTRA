@@ -38,14 +38,19 @@ vertice_h * readfile(FILE * infile, int vertices, int edges){
 
   vertice_h * adj_list = malloc(vertices * sizeof(vertice_h));
 
-  int pl_v, pl_x, pl_y;
+  int pl_v;
+
+  unsigned short pl_x, pl_y;
 
   int i;
 
   for (i = 0; i < vertices; i++){
-    fscanf(infile, "%d %d %d", &pl_v, &pl_x, &pl_y);
+    fscanf(infile, "%d %hu %hu", &pl_v, &pl_x, &pl_y);
     adj_list[pl_v].v_x = pl_x;
     adj_list[pl_v].v_y = pl_y;
+    adj_list[pl_v].dist = 0;
+    adj_list[pl_v].heap_idx = 0;
+    adj_list[pl_v].head_l = NULL;
   }
 
   int cur_v, adj_v;
